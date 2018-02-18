@@ -1,0 +1,13 @@
+.tile {
+  border: 1px solid #1890ff;
+  border-radius: 5px;
+  max-width: 600px;
+  padding: 16px;
+  margin: 16px;
+  .ant-row {
+    margin-bottom: 5px;
+  }
+  .ant-select {
+    width : 100%;
+  }
+}

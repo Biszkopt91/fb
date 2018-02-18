@@ -1,26 +1,26 @@
+import { ConditionType, FormItemType, formItemTypes } from '../models/Form';
+
 export const conditionsConfiguration = {
-  eq: 'Equals' as Condition,
-  gt: 'Greater than' as Condition,
-  lt: 'Less than' as Condition
+  eq: 'Equals' as ConditionType,
+  gt: 'Greater than' as ConditionType,
+  lt: 'Less than' as ConditionType
 };
 const _dictionaryConfiguration = [
-  { value: conditionsConfiguration.eq, enableInText: true, enabledInNumber: true, enabledInRadio: true },
-  { value: conditionsConfiguration.gt, enableInText: false, enabledInNumber: true, enabledInRadio: false },
-  { value: conditionsConfiguration.lt, enableInText: false, enabledInNumber: true, enabledInRadio: false },
+  { value: conditionsConfiguration.eq, enableIn: [formItemTypes.text, formItemTypes.number, formItemTypes.radio] },
+  { value: conditionsConfiguration.gt, enableIn: [formItemTypes.number] },
+  { value: conditionsConfiguration.lt, enableIn: [formItemTypes.number] },
 ];
-type Condition = 'Equals' | 'Greater than' | 'Less than';
 
 export class Conditions {
-  static get dictionary(): Condition[] {
+  static get dictionary(): ConditionType[] {
     return _dictionaryConfiguration.map(condition => condition.value);
   }
-  static get textDictionary(): Condition[] {
-    return _dictionaryConfiguration.filter(condition => condition.enableInText).map(condition => condition.value);
-  }
-  static get numberDictionary(): Condition[] {
-    return _dictionaryConfiguration.filter(condition => condition.enabledInNumber).map(condition => condition.value);
-  }
-  static get radioDictionary(): Condition[] {
-    return _dictionaryConfiguration.filter(condition => condition.enabledInRadio).map(condition => condition.value);
+
+  static dictionaryByType(formItemType: FormItemType) {
+    return formItemType ? 
+      _dictionaryConfiguration
+        .filter(configuration => configuration.enableIn.some(formItem => formItem === formItemType))
+        .map(condition => condition.value)
+      : Conditions.dictionary;
   }
 }

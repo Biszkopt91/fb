@@ -1,12 +1,12 @@
 import * as React from 'react';
 import './App.scss';
 
-import Router from './features/router/Router';
+import FakeRouter from './features/fake-router/FakeRouter';
 
 class App extends React.Component {
   render() {
     return (
-     <Router/>
+     <FakeRouter/>
     );
   }
 }
