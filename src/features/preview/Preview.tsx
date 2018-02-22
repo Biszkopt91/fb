@@ -16,9 +16,7 @@ class Create extends React.Component<CreateProps> {
 
   render() {
     return (
-      <div>
-        <FormBuilder formBuilderItems={this.props.nodes} formItems={this.props.formItems}/>
-      </div>
+      <FormBuilder formBuilderItems={this.props.nodes} formItems={this.props.formItems}/>
     );
   }
 }

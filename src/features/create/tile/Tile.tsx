@@ -15,6 +15,28 @@ export interface TileProps {
   node: BuilderItem;
 }
 
+const ConditionValue = (node: BuilderItem, selectUpdater: (value: string) => void, inputUpdater: (ev: any) => void) => {
+  
+
+  return node.entityType === 'Radio' ?
+    (
+      <Select 
+        value={node.condition.value as string} 
+        onSelect={selectUpdater}
+      >
+        <Option value="Yes">Yes</Option>
+        <Option value="No">No</Option>
+      </Select>
+    ) :
+    (
+      <Input 
+        type={node.entityType.toLowerCase()} 
+        value={node.condition.value}
+        onChange={inputUpdater}
+      />
+    );
+};
+
 class Tile extends React.Component<TileProps> {
   tileUpdater: Updater;
 
@@ -22,6 +44,22 @@ class Tile extends React.Component<TileProps> {
     super(props);
     this.tileUpdater = new Updater(props.node.id, props.parentId);
   }
+
+  conditionSelectUpdate = (value: string) => { this.handleConditionValueUpdate(value); };
+
+  conditionInputUpdate = (ev: any) => { this.handleConditionValueUpdate(ev.target.value); };
+
+  handleConditionTypeUpdate = (value: ConditionType) => { this.tileUpdater.updateConditionType(value); };
+
+  handleConditionValueUpdate = (value: string) => { this.tileUpdater.updateConditionValue(value); };
+
+  handleQuestionTypeUpdate = (ev: any) => { this.tileUpdater.updateQuestion(ev.target.value); };
+
+  handleItemTypeUpdate = (value: FormItemType) => { this.tileUpdater.updateItemType(value); };
+
+  handleItemAdd = () => { this.tileUpdater.deleteItem(); };
+
+  handleItemDelete = () => { this.tileUpdater.addSubItem(); };
 
   render() {
     let node = this.props.node;
@@ -34,7 +72,7 @@ class Tile extends React.Component<TileProps> {
           <Col span={12}>
             <Select 
               value={node.condition.type as string}
-              onSelect={(value: ConditionType) => { this.tileUpdater.updateConditionType(value); }}
+              onSelect={this.handleConditionTypeUpdate}
             >
               {Conditions.dictionaryByType(node.entityType as FormItemType).map(item =>
                 <Option key={item}>{item}</Option>
@@ -42,7 +80,7 @@ class Tile extends React.Component<TileProps> {
             </Select>
           </Col>
           <Col span={6}>
-            {ConditionValue(node, (value: string) => { this.tileUpdater.updateConditionValue(value); })}
+            { ConditionValue(node, this.conditionSelectUpdate, this.conditionInputUpdate)}
           </Col>
         </Row>
         <Row gutter={16}>
@@ -52,9 +90,7 @@ class Tile extends React.Component<TileProps> {
           <Col span={18}>
             <Input 
               value={node.question} 
-              onChange={(ev: any) => { 
-                this.tileUpdater.updateQuestion(ev.target.value);
-              }}
+              onChange={this.handleQuestionTypeUpdate}
             />
           </Col>
         </Row>
@@ -65,7 +101,7 @@ class Tile extends React.Component<TileProps> {
           <Col span={18}>
             <Select 
               value={node.entityType as string} 
-              onSelect={(value: FormItemType) => { this.tileUpdater.updateItemType(value); }}
+              onSelect={this.handleItemTypeUpdate}
             >
               {FormItemTypes.dictionary.map(item =>
                 <Option key={item}>{item}</Option>
@@ -75,40 +111,16 @@ class Tile extends React.Component<TileProps> {
         </Row>
         <Row gutter={16} justify="end">
           <Col span={6}>
-            <Button type="danger" onClick={() => { this.tileUpdater.deleteItem(); }}>Remove</Button>
+            <Button type="danger" onClick={this.handleItemAdd}>Remove</Button>
           </Col>
           <Col span={6}>
-          <Button type="primary" onClick={() => { this.tileUpdater.addSubItem(); }}>Add sub-item</Button>
+          <Button type="primary" onClick={this.handleItemDelete}>Add sub-item</Button>
 
           </Col>
         </Row>
       </div>
     );
   }
-}
-
-function ConditionValue(node: BuilderItem, updateFunction: (value: string) => void) {
-  return node.entityType === 'Radio' ?
-    (
-      <Select 
-        value={node.condition.value as string} 
-        onSelect={(value: string) => {
-          updateFunction(value);
-        }}
-      >
-        <Option value="Yes">Yes</Option>
-        <Option value="No">No</Option>
-      </Select>
-    ) :
-    (
-      <Input 
-        type={node.entityType.toLowerCase()} 
-        value={node.condition.value} 
-        onChange={(ev: any) => {
-          updateFunction(ev.target.value);
-        }}
-      />
-    );
 }
 
 export default Tile;

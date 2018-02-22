@@ -11,6 +11,25 @@ interface NodeBuilderProps {
   formItem: FormItem;
 }
 
+const FormElement = (formBuilderItem: BuilderItem, formItem: FormItem, onChange: (value: string) => void) => {
+  function onChangeHandler(ev: any) {
+    onChange(ev.target.value);
+  }
+  switch (formBuilderItem.entityType) {
+    case entityTypesConfiguration.radio:
+      return (
+        <RadioGroup onChange={onChangeHandler} value={formItem.value}>
+          <Radio value={'Yes'}>Yes</Radio>
+          <Radio value={'No'}>No</Radio>
+        </RadioGroup>
+      );
+    default:
+      return (
+        <Input type={formBuilderItem.entityType.toLowerCase()} value={formItem.value} onChange={onChangeHandler}/>
+      );
+  }
+};
+
 class FormNode extends React.Component<NodeBuilderProps> {
   formElementUpdater: Updater;
   bus = Bus.Instance;
@@ -28,34 +47,17 @@ class FormNode extends React.Component<NodeBuilderProps> {
     this.formElementUpdater.unsubscribeEvents();
   }
 
+  handelValueUpdate = (value: string) => this.formElementUpdater.valueUpdated(value)
+
   render() {
     let formBuilderItem = this.props.formBuilderItem as BuilderItem;
     let formItem = this.props.formItem as FormItem;
     return (
       <div>
         <h3>{formBuilderItem.question}?</h3>
-        {FormElement(formBuilderItem , formItem, (value: string) => this.formElementUpdater.valueUpdated(value))}
+        {FormElement(formBuilderItem , formItem, this.handelValueUpdate)}
       </div>
     );
-  }
-}
-
-function FormElement(formBuilderItem: BuilderItem, formItem: FormItem, onChange: (value: string) => void) {
-  function onChangeHandler(ev: any) {
-    onChange(ev.target.value);
-  }
-  switch (formBuilderItem.entityType) {
-    case entityTypesConfiguration.radio:
-      return (
-        <RadioGroup onChange={onChangeHandler} value={formItem.value}>
-          <Radio value={'Yes'}>Yes</Radio>
-          <Radio value={'No'}>No</Radio>
-        </RadioGroup>
-      );
-    default:
-      return (
-        <Input type={formBuilderItem.entityType.toLowerCase()} value={formItem.value} onChange={onChangeHandler}/>
-      );
   }
 }
 

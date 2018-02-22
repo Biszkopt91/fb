@@ -9,6 +9,19 @@ interface NodeBuilderProps {
   nodes: BuilderItem[];
 }
 
+const TileList = (parentId: string, nodes: BuilderItem[] ): any => {
+  return nodes.map(node => 
+    (
+      <div key={`tile-${node.id}`}>
+        <Tile parentId={parentId} node={node}/>
+        <div className="sub-node">
+          <NodeBuilder parentId={node.id} nodes={node.children}/>
+        </div>
+      </div>
+    )
+  );
+};
+
 class NodeBuilder extends React.Component<NodeBuilderProps> {
 
   render() {
@@ -20,19 +33,6 @@ class NodeBuilder extends React.Component<NodeBuilderProps> {
       </div>
     );
   }
-}
-
-function TileList(parentId: string, nodes: BuilderItem[] ): any {
-  return nodes.map(node => 
-    (
-      <div key={`tile-${node.id}`}>
-        <Tile parentId={parentId} node={node}/>
-        <div className="sub-node">
-          <NodeBuilder parentId={node.id} nodes={node.children}/>
-        </div>
-      </div>
-    )
-  );
 }
 
 export default NodeBuilder;

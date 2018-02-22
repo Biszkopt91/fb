@@ -17,10 +17,10 @@ class Create extends React.Component<CreateProps> {
 
   render() {
     return (
-      <div>
+      <>
         <NodeBuilder parentId="" nodes={this.props.nodes}/>
         <Button type="primary" onClick={() => { this.store.addItem(); }}>Add item</Button>
-      </div>
+      </>
     );
   }
 }
