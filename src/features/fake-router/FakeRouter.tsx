@@ -5,7 +5,7 @@ import Export from '../export/Export';
 import Preview from '../preview/Preview';
 import { BuilderItem, FormItem } from '../../models/Form';
 import Store from '../../store/Store';
-import Bus from '../../Bus';
+import EventBus from '../../Bus';
 import './FakeRouter.scss';
 
 const TabPane = Tabs.TabPane;
@@ -17,7 +17,7 @@ interface FakeRouterState {
 
 class FakeRouter extends React.Component<any, FakeRouterState> {
   store: Store = Store.Instance;
-  bus: any = Bus.Instance;
+  bus: EventBus = EventBus.Instance;
   subscribeDestroyers: any[] = [];
   constructor(props: any, state: FakeRouterState) {
     super(props, state);
@@ -29,7 +29,9 @@ class FakeRouter extends React.Component<any, FakeRouterState> {
   }
 
   subscribeEvents() {
-    this.subscribeDestroyers.push(this.bus.on(Bus.Configuration.storeUpdated, this.handleStoreUpdate.bind(this)));
+    this.subscribeDestroyers.push(
+      this.bus.subscribe(this.bus.Configuration.storeUpdated, this.handleStoreUpdate.bind(this))
+    );
   }
 
   handleStoreUpdate() {
@@ -40,9 +42,7 @@ class FakeRouter extends React.Component<any, FakeRouterState> {
   }
 
   componentWillUnmount() {
-    this.subscribeDestroyers.forEach(destroyer => {
-      this.bus.off(destroyer);
-    });
+    this.bus.unsubscribeEvents(this.subscribeDestroyers);
   }
 
   componentDidMount() {
@@ -52,10 +52,11 @@ class FakeRouter extends React.Component<any, FakeRouterState> {
   render() {
     const nodes = this.state.nodes;
     const formItems = this.state.formItems;
+    const bus = this.bus;
     return (
       <Tabs className="container" defaultActiveKey="1">
-        <TabPane tab="Create" key="1" ><Create nodes={nodes}/></TabPane>
-        <TabPane tab="Preview" key="2"><Preview nodes={nodes} formItems={formItems}/></TabPane>
+        <TabPane tab="Create" key="1" ><Create nodes={nodes} bus={bus}/></TabPane>
+        <TabPane tab="Preview" key="2"><Preview nodes={nodes} formItems={formItems} bus={bus}/></TabPane>
         <TabPane tab="Export" key="3"><Export nodes={nodes}/></TabPane>
       </Tabs>
     );

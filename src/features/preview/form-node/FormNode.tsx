@@ -9,6 +9,7 @@ const RadioGroup = Radio.Group;
 interface NodeBuilderProps {
   formBuilderItem: BuilderItem;
   formItem: FormItem;
+  bus: Bus;
 }
 
 const FormElement = (formBuilderItem: BuilderItem, formItem: FormItem, onChange: (value: string) => void) => {
@@ -32,10 +33,9 @@ const FormElement = (formBuilderItem: BuilderItem, formItem: FormItem, onChange:
 
 class FormNode extends React.Component<NodeBuilderProps> {
   formElementUpdater: Updater;
-  bus = Bus.Instance;
   constructor(props: NodeBuilderProps) {
     super(props);
-    this.formElementUpdater = new Updater(props.formBuilderItem.id);
+    this.formElementUpdater = new Updater(props.formBuilderItem, props.formItem, props.bus);
     this.formElementUpdater.checkValidation();
   }
 
@@ -47,7 +47,7 @@ class FormNode extends React.Component<NodeBuilderProps> {
     this.formElementUpdater.unsubscribeEvents();
   }
 
-  handelValueUpdate = (value: string) => this.formElementUpdater.valueUpdated(value)
+  handelValueUpdate = (value: string) => { this.formElementUpdater.valueUpdated(value); };
 
   render() {
     let formBuilderItem = this.props.formBuilderItem as BuilderItem;

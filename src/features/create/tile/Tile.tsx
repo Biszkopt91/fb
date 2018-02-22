@@ -5,7 +5,7 @@ import { BuilderItem, FormItemType, ConditionType } from '../../../models/Form';
 import { FormItemTypes } from '../../../dictionaries/FormItemTypes';
 import { Conditions } from '../../../dictionaries/Conditions';
 import Updater from './Updater';
-
+import EventBus from '../../../Bus';
 import './Tile.scss';
 
 const Option = Select.Option;
@@ -13,11 +13,11 @@ const Option = Select.Option;
 export interface TileProps {
   parentId: string;
   node: BuilderItem;
+  bus: EventBus;
 }
 
 const ConditionValue = (node: BuilderItem, selectUpdater: (value: string) => void, inputUpdater: (ev: any) => void) => {
   
-
   return node.entityType === 'Radio' ?
     (
       <Select 
@@ -42,7 +42,7 @@ class Tile extends React.Component<TileProps> {
 
   constructor(props: TileProps) {
     super(props);
-    this.tileUpdater = new Updater(props.node.id, props.parentId);
+    this.tileUpdater = new Updater(props.node, props.parentId, this.props.bus);
   }
 
   conditionSelectUpdate = (value: string) => { this.handleConditionValueUpdate(value); };
@@ -80,7 +80,7 @@ class Tile extends React.Component<TileProps> {
             </Select>
           </Col>
           <Col span={6}>
-            { ConditionValue(node, this.conditionSelectUpdate, this.conditionInputUpdate)}
+            {ConditionValue(node, this.conditionSelectUpdate, this.conditionInputUpdate)}
           </Col>
         </Row>
         <Row gutter={16}>

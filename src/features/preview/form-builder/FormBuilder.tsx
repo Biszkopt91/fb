@@ -1,35 +1,39 @@
 import * as React from 'react';
 import FormNode from '../form-node/FormNode';
 import { BuilderItem, FormItem } from '../../../models/Form';
-
+import EventBus from '../../../Bus';
 import './FormBuilder.scss';
 
 interface NodeBuilderProps {
   formBuilderItems: BuilderItem[];
   formItems: FormItem[];
+  bus: EventBus;
 }
 
 class FormBuilder extends React.Component<NodeBuilderProps> {
 
   render() {
-    const formBuilderItems = this.props.formBuilderItems;
-    const formItems = this.props.formItems;
+    const props = this.props;
     return (
       <div className="node">
-        {FormElementList( formBuilderItems, formItems)}
+        {FormElementList(props)}
       </div>
     );
   }
 }
 
-function FormElementList(formBuilderItems: BuilderItem[], formItems: FormItem[] ): any {
-  return formBuilderItems.map((formBuilderItem, index) => 
+function FormElementList(props: NodeBuilderProps): any {
+  return props.formBuilderItems.map((formBuilderItem, index) => 
     (
       <div key={`form-element-${formBuilderItem.id}`}>
-        <FormNode formBuilderItem={formBuilderItem} formItem={formItems[index]}/>
+        <FormNode formBuilderItem={formBuilderItem} formItem={props.formItems[index]} bus={props.bus}/>
         <div className="sub-node">
-          {formItems[index].isValid && 
-            <FormBuilder formBuilderItems={formBuilderItem.children} formItems={formItems[index].children}/>
+          {props.formItems[index].isValid && 
+            <FormBuilder 
+              formBuilderItems={formBuilderItem.children} 
+              formItems={props.formItems[index].children} 
+              bus={props.bus}
+            />
           }
         </div>
       </div>
