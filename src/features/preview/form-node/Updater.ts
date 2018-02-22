@@ -1,38 +1,35 @@
-import Bus from '../../../Bus';
-import Store from '../../../store/Store';
 import { BuilderItem, FormItem } from '../../../models/Form';
 import { conditionsConfiguration  } from '../../../dictionaries/Conditions';
+import EventBus from '../../../Bus';
 
 export default class TileUpdater {
-  bus: any = Bus.Instance;
-  store: Store = Store.Instance;
 
   subscribeDestroyers: any[] = [];
-  constructor(private builderItem: BuilderItem, private formItem: FormItem) {}
+  constructor(private builderItem: BuilderItem, private formItem: FormItem, private bus: EventBus) {}
 
   subscribeEvents() {
     return this.subscribeDestroyers.push(
-      Bus.subscribe(
-        `${Bus.Configuration.validationConditionUpdated}-${this.builderItem.id}`,
+      this.bus.subscribe(
+        `${this.bus.Configuration.validationConditionUpdated}-${this.builderItem.id}`,
         this.checkValidation.bind(this)
       )
     );
   }
 
   unsubscribeEvents() {
-    Bus.unsubscribeEvents(this.subscribeDestroyers);
+    this.bus.unsubscribeEvents(this.subscribeDestroyers);
   }
 
   checkValidation() {
     this.formItem.isValid = this.isValid(this.formItem.value);
-    this.store.commitChanges();
+    this.bus.triggerCommitChanges();
   }
 
   valueUpdated(newValue: string) {
     this.formItem.value = newValue;
     this.formItem.isValid = this.isValid(newValue);
 
-    this.store.commitChanges();
+    this.bus.triggerCommitChanges();
   }
 
   private isValid(value: string) {

@@ -5,7 +5,6 @@ import LocalStorage from './LocalStorage';
 
 export default class Store {
   private static _instance: Store;
-  bus: any = Bus.Instance;
   localStorage: LocalStorage = LocalStorage.Instance;
   builderItems: BuilderItem[];
   formItems: FormItem[];
@@ -31,16 +30,23 @@ export default class Store {
     }
   }
 
-  constructor() {
+  constructor(private bus: Bus = Bus.Instance) {
     const localStorageData = localStorage.getItem(LocalStorage.nodes.formBuilderNodes);
     const formItemsLS = localStorage.getItem(LocalStorage.nodes.formItems);
     this.builderItems = localStorageData ? JSON.parse(localStorageData).formBuilderNodes : [];
     this.formItems = formItemsLS ? JSON.parse(formItemsLS).formItems : [];
-    this.bus.emit(Bus.Configuration.storeUpdated);
+    this.bus.triggerStoreUpdated();
+    this.subscribeEvents();
   }
 
   public static get Instance() {
     return this._instance || (this._instance = new this());
+  }
+
+  subscribeEvents() {
+    this.bus.subscribe(this.bus.Configuration.addItem, this.addItem.bind(this));
+    this.bus.subscribe(this.bus.Configuration.commitChanges, this.commitChanges.bind(this));
+    this.bus.subscribe(this.bus.Configuration.deleteItem, this.deleteItem.bind(this));
   }
 
   public addItem(parentId?: string) {
@@ -57,7 +63,7 @@ export default class Store {
   public commitChanges() {
     localStorage.setItem(LocalStorage.nodes.formBuilderNodes, JSON.stringify({ formBuilderNodes: this.builderItems }));
     localStorage.setItem(LocalStorage.nodes.formItems, JSON.stringify({ formItems: this.formItems }));
-    this.bus.emit(Bus.Configuration.storeUpdated);
+    this.bus.triggerStoreUpdated();
   }
 
   private addItemToParent(parentId: string, { builderItem, formItem }: FormConfiguration) {

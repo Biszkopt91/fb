@@ -2,24 +2,24 @@ import * as React from 'react';
 import NodeBuilder from './node-builder/NodeBuilder';
 import { BuilderItem } from '../../models/Form';
 import { Button } from 'antd';
-
-import Store from '../../store/Store';
+import EventBus from '../../Bus';
 
 interface CreateProps {
   nodes: BuilderItem[];
+  bus: EventBus;
 }
 class Create extends React.Component<CreateProps> {
-  store: Store;
   constructor(props: any) {
     super(props);
-    this.store = Store.Instance;
   }
+
+  handleAddItemClick = () => { this.props.bus.triggerAddItem(); };
 
   render() {
     return (
       <>
-        <NodeBuilder parentId="" nodes={this.props.nodes}/>
-        <Button type="primary" onClick={() => { this.store.addItem(); }}>Add item</Button>
+        <NodeBuilder parentId="" nodes={this.props.nodes} bus={this.props.bus}/>
+        <Button type="primary" onClick={this.handleAddItemClick}>Add item</Button>
       </>
     );
   }

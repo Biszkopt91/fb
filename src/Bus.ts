@@ -1,14 +1,18 @@
 var Minibus = require('minibus');
 
 export default class EventBus {
+  private static _instance: EventBus;
+  private static minibus: any = Minibus.create();
 
-  private static _instance: any;
-  
-  public static get Instance() {
-    return this._instance || (this._instance = Minibus.create());
+  private static trigger(topic: string, ...restArgs: any[]) {
+    EventBus.minibus.emit(topic, ...restArgs);
   }
 
-  public static get Configuration() {
+  public static get Instance() {
+    return this._instance || (this._instance = new this());
+  }
+
+  get Configuration() {
     return {
       storeUpdated: 'store-updated',
       validationConditionUpdated: 'validation-condition-updated',
@@ -18,41 +22,37 @@ export default class EventBus {
     };
   }
 
-  public static subscribe(topic: string, callback: () => void) {
-    return EventBus.Instance.on(topic, callback);
+  subscribe(topic: string, callback: () => void) {
+    return EventBus.minibus.on(topic, callback);
   }
 
-  public static unsubscribe(destroyer: any) {
-    EventBus.Instance.off(destroyer);
+  unsubscribe(destroyer: any) {
+    EventBus.minibus.off(destroyer);
   }
   
-  public static unsubscribeEvents(subscribeDestroyers: any) {
+  unsubscribeEvents(subscribeDestroyers: any) {
     subscribeDestroyers.forEach((destroyer: any) => {
-      EventBus.unsubscribe(destroyer);
+      this.unsubscribe(destroyer);
     });
   }
 
-  public static triggerStoreUpdated() {
-    EventBus.trigger(EventBus.Configuration.storeUpdated);
+  triggerStoreUpdated() {
+    EventBus.trigger(this.Configuration.storeUpdated);
   }
 
-  public static triggerValidationConditionUpdated() {
-    EventBus.trigger(EventBus.Configuration.validationConditionUpdated);
+  triggerValidationConditionUpdated(itemId: string) {
+    EventBus.trigger(`${this.Configuration.validationConditionUpdated}-${itemId}`);
   }
 
-  public static triggerCommitChanges() {
-    EventBus.trigger(EventBus.Configuration.commitChanges);
+  triggerCommitChanges() {
+    EventBus.trigger(this.Configuration.commitChanges);
   }
 
-  public static triggerAddItem(parentId?: string) {
-    EventBus.trigger(EventBus.Configuration.addItem, parentId);
+  triggerAddItem(parentId?: string) {
+    EventBus.trigger(this.Configuration.addItem, parentId);
   }
 
-  public static triggerDeleteItem(parentId: string, itemId: string) {
-    EventBus.trigger(EventBus.Configuration.deleteItem, parentId, itemId);
-  }
-
-  private static trigger(topic: string, ...restArgs: any[]) {
-    EventBus.Instance.emit(topic, ...restArgs);
+  triggerDeleteItem(parentId: string, itemId: string) {
+    EventBus.trigger(this.Configuration.deleteItem, parentId, itemId);
   }
 }
