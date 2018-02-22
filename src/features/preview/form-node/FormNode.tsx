@@ -35,7 +35,7 @@ class FormNode extends React.Component<NodeBuilderProps> {
   bus = Bus.Instance;
   constructor(props: NodeBuilderProps) {
     super(props);
-    this.formElementUpdater = new Updater(props.formBuilderItem.id);
+    this.formElementUpdater = new Updater(props.formBuilderItem, props.formItem);
     this.formElementUpdater.checkValidation();
   }
 
@@ -47,7 +47,7 @@ class FormNode extends React.Component<NodeBuilderProps> {
     this.formElementUpdater.unsubscribeEvents();
   }
 
-  handelValueUpdate = (value: string) => this.formElementUpdater.valueUpdated(value)
+  handelValueUpdate = (value: string) => { this.formElementUpdater.valueUpdated(value); };
 
   render() {
     let formBuilderItem = this.props.formBuilderItem as BuilderItem;

@@ -21,8 +21,8 @@ export default class Store {
   }
 
   private static *deepIterator(data: StoreItemBase<any>[]): any {
-    for (var i = 0; i < data.length; i++) {
-      var val = data[i];
+    for (let i = 0; i < data.length; i++) {
+      const val = data[i];
       yield val;
   
       if (val.children) {

@@ -6,17 +6,13 @@ import { conditionsConfiguration  } from '../../../dictionaries/Conditions';
 export default class TileUpdater {
   bus: any = Bus.Instance;
   store: Store = Store.Instance;
-  builderItem: BuilderItem;
-  formItem: FormItem;
+
   subscribeDestroyers: any[] = [];
-  constructor(private itemId: string) {
-    this.builderItem = Store.findItem(this.store.builderItems, this.itemId);
-    this.formItem = Store.findItem(this.store.formItems, this.itemId);
-  }
+  constructor(private builderItem: BuilderItem, private formItem: FormItem) {}
 
   subscribeEvents() {
-    this.subscribeDestroyers.push(
-      this.bus.on(
+    return this.subscribeDestroyers.push(
+      Bus.subscribe(
         `${Bus.Configuration.validationConditionUpdated}-${this.builderItem.id}`,
         this.checkValidation.bind(this)
       )
@@ -24,9 +20,7 @@ export default class TileUpdater {
   }
 
   unsubscribeEvents() {
-    this.subscribeDestroyers.forEach(destroyer => {
-      this.bus.off(destroyer);
-    });
+    Bus.unsubscribeEvents(this.subscribeDestroyers);
   }
 
   checkValidation() {

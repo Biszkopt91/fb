@@ -5,11 +5,8 @@ import { BuilderItem, FormItemType, ConditionType } from '../../../models/Form';
 export default class TileUpdater {
   bus: any = Bus.Instance;
   store: Store = Store.Instance;
-  item: BuilderItem;
   
-  constructor(private itemId: string, private parentId: string) {
-    this.item = Store.findItem(this.store.builderItems, this.itemId);
-  }
+  constructor(private item: BuilderItem, private parentId: string) {}
 
   emitValidationStateChange() {
     this.bus.emit(`${Bus.Configuration.validationConditionUpdated}-${this.item.id}`);
@@ -17,8 +14,7 @@ export default class TileUpdater {
 
   updateItemType(entityType: FormItemType) {
     this.item.entityType = entityType;
-    this.item.condition.value = '';
-    this.item.condition.type = 'Equals';
+    this.resetConditionValue();
     this.store.commitChanges();
     this.emitValidationStateChange();
   }
@@ -37,12 +33,17 @@ export default class TileUpdater {
     this.store.commitChanges();
   }
 
+  resetConditionValue() {
+    this.item.condition.value = '';
+    this.item.condition.type = 'Equals';
+  }
+
   deleteItem() {
-    this.store.deleteItem(this.parentId, this.itemId);
+    this.store.deleteItem(this.parentId, this.item.id);
   }
 
   addSubItem() {
-    this.store.addItem(this.itemId);
+    this.store.addItem(this.item.id);
   }
  
 }

@@ -29,7 +29,7 @@ class FakeRouter extends React.Component<any, FakeRouterState> {
   }
 
   subscribeEvents() {
-    this.subscribeDestroyers.push(this.bus.on(Bus.Configuration.storeUpdated, this.handleStoreUpdate.bind(this)));
+    this.subscribeDestroyers.push(Bus.subscribe(Bus.Configuration.storeUpdated, this.handleStoreUpdate.bind(this)));
   }
 
   handleStoreUpdate() {
